@@ -49,7 +49,7 @@ def Solve_V_U(A):
 
 def Solve_Sig(A):
     """
-    Takes matrix A and calulates the orthonormal matrix V
+    Takes matrix A and calulates the diagonal matix Sigma
 
     Args: A matrix titled A (nxm)
 
