@@ -20,13 +20,12 @@ def Enter_matrix():
     """
     n = input("Enter number of rows: \n")
     m = input("Enter number of columns: \n")
-    A = np.zeros(n, m)
+    A = np.zeros([int(n), int(m)], dtype=int)
     # Populate matrix A
-    for i in range(n):
-        for j in range(m):
-            A[i, j] = input("Enter A" + i + j + " value: ")
-            print("")
-
+    for i in range(int(n)):
+        for j in range(int(m)):
+            val = input("Enter A" + str(i + 1) + str(j + 1) + " value: ")
+            A[i, j] = int(val)
     return A
 
 
@@ -61,13 +60,16 @@ def Solve_Sig(A):
 
 def main():
     """Main entry point of the app"""
-    A = np.array([[2.0, 4.0], [3.0, 1.0]])
-    print(A)
+    A = Enter_matrix()
+    print("Matrix A: ")
+    print(str(A))
     print("")
     X = Solve_V_U(A)
-    print(X[1])
+    print("Matrix V: ")
+    print(X[0])
     print("")
-    print(X[2])
+    print("Matrix U: ")
+    print(X[1])
 
 
 if __name__ == "__main__":
