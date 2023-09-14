@@ -10,6 +10,26 @@ Factoring one matrix into three A = U*(Sigma)*(V^T)
 """
 
 
+def Enter_matrix():
+    """
+    Takes user input to create a matrix A
+
+    Args: None
+
+    Returns: user inputted matrix
+    """
+    n = input("Enter number of rows: \n")
+    m = input("Enter number of columns: \n")
+    A = np.zeros(n, m)
+    # Populate matrix A
+    for i in range(n):
+        for j in range(m):
+            A[i, j] = input("Enter A" + i + j + " value: ")
+            print("")
+
+    return A
+
+
 def Solve_V_U(A):
     """
     Takes matrix A and calulates the orthonormal matrix V and U
@@ -23,7 +43,6 @@ def Solve_V_U(A):
     AT = np.transpose(A, axes=None)
     V = np.matmul(AT, A)  # A^T*A matrix
     U = np.matmul(A, AT)  # A*A^T matrix
-
     X = [V, U]
     return X
 
@@ -36,6 +55,8 @@ def Solve_Sig(A):
 
     Returns: A matrix Sig (diagnial matrix) containing r elements equal to the root of the positive eigen values
     """
+    sig = 0
+    return sig
 
 
 def main():
