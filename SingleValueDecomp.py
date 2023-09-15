@@ -29,6 +29,11 @@ def Enter_matrix():
     return A
 
 
+def Eigen_values(V):
+    I = np.identity(np.shape(V))
+    eigvals = V - (lam * I)
+
+
 def Solve_V_U(A):
     """
     Takes matrix A and calulates the orthonormal matrix V and U
@@ -46,9 +51,10 @@ def Solve_V_U(A):
     return X
 
 
-def Solve_Sig(A):
+def Solve_sigma(A):
     """
-    Takes matrix A and calulates the diagonal matix Sigma
+    Takes matrix V or U (Both have same eigen values) and calulates the diagonal matix Sigma with roots of
+    positive eigen values
 
     Args: A matrix titled A (nxm)
 
@@ -65,8 +71,12 @@ def main():
     print(str(A))
     print("")
     X = Solve_V_U(A)
+    Sigma = Solve_sigma(X[0])
     print("Matrix V: ")
     print(X[0])
+    print("")
+    print("Matrix Sigma: ")
+    print(Sigma)
     print("")
     print("Matrix U: ")
     print(X[1])
