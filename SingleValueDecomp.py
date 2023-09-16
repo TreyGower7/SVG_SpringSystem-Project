@@ -29,11 +29,6 @@ def Enter_matrix():
     return A
 
 
-def Eigen_values(V):
-    I = np.identity(np.shape(V))
-    eigvals = V - (lam * I)
-
-
 def Solve_V_U(A):
     """
     Takes matrix A and calulates the orthonormal matrix V and U
@@ -51,7 +46,7 @@ def Solve_V_U(A):
     return X
 
 
-def Solve_sigma(A):
+def Solve_sigma(V):
     """
     Takes matrix V or U (Both have same eigen values) and calulates the diagonal matix Sigma with roots of
     positive eigen values
@@ -60,8 +55,15 @@ def Solve_sigma(A):
 
     Returns: A matrix Sig (diagnial matrix) containing r elements equal to the root of the positive eigen values
     """
-    sig = 0
-    return sig
+    Sigma = np.zeros(np.shape(V))
+    eig_val = np.linalg.eigvals(V)
+    # Check for positve eigen values
+    for i in range(len(eig_val)):
+        if eig_val[i] < 0:
+            return "Error Non-Positive Eigen Value" + str(eig_val[i])
+        else:
+            Sigma[i, i] = eig_val[i]
+    return Sigma
 
 
 def main():
