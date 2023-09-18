@@ -1,5 +1,5 @@
-import math
 import numpy as np
+import math
 
 __author__ = "Trey Gower"
 __version__ = "0.1"
@@ -46,12 +46,12 @@ def Solve_V_U(A):
     return X
 
 
-def Solve_sigma(V):
+def Solve_sigma_condnum(V):
     """
     Takes matrix V or U (Both have same eigen values) and calulates the diagonal matix Sigma with roots of
-    positive eigen values
+    positive eigen values. Also calculates Condtiion Number.
 
-    Args: A matrix titled A (nxm)
+    Args: A matrix titled V (nxm)
 
     Returns: A matrix Sig (diagnial matrix) containing r elements equal to the root of the positive eigen values
     """
@@ -59,29 +59,41 @@ def Solve_sigma(V):
     eig_val = np.linalg.eigvals(V)
     # Check for positve eigen values
     for i in range(len(eig_val)):
-        if eig_val[i] < 0:
-            return "Error Non-Positive Eigen Value" + str(eig_val[i])
+        if eig_val[i] <= 0:
+            return "Error Non-Positive or Zero Eigen Value" + str(eig_val[i])
         else:
-            Sigma[i, i] = eig_val[i]
-    return Sigma
+            Sigma[i, i] = math.sqrt(eig_val[i])
+    # condition number is ||A||_2 * ||A^-1||_2 or |Lamda_max|/|Lamda_min|
+    CondNum = np.max(eig_val) / np.min(eig_val)
+    return [Sigma, CondNum]
+
+
+def SVD():
+    """
+    Returns all SVD matrices, condition number and the inverse given by A^-1= V*Sigma^{-1}*U^T
+    """
+    A = Enter_matrix()
+    X = Solve_V_U(A)
+    U = X[0]
+    V = X[1]
+    L = Solve_sigma_condnum(V)
+    Sigma = L[0]
+    Sigmainv = np.zeros(np.shape(Sigma))
+    CondNum = L[1]
+    # inverse of matrix Sigma is just the reciprical of the diagonal values in sigma
+    for i in range(len(Sigma)):
+        Sigmainv[i, i] = 1 / Sigma[i, i]
+    soln = [U, Sigma, V, CondNum]
+    return soln
 
 
 def main():
     """Main entry point of the app"""
-    A = Enter_matrix()
-    print("Matrix A: ")
-    print(str(A))
-    print("")
-    X = Solve_V_U(A)
-    Sigma = Solve_sigma(X[0])
-    print("Matrix V: ")
-    print(X[0])
-    print("")
-    print("Matrix Sigma: ")
-    print(Sigma)
-    print("")
-    print("Matrix U: ")
-    print(X[1])
+    J = SVD()
+
+    print(J[1])
+    print(J[2])
+    print(J[3])
 
 
 if __name__ == "__main__":
