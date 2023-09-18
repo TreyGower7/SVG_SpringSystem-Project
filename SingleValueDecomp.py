@@ -73,7 +73,10 @@ def Solve_V(A, eig_val, U):
     """
     U_1 = U[:, 0]
     U_2 = U[:, 1]
-    return U_1
+    eig_valrec = 1 / eig_val
+    V_1 = np.dot(eig_valrec, np.transpose(A))
+    V_1 = np.matmul(V_1, U_1)
+    return V_1
 
 
 def Solve_Condition(eig_val):
@@ -105,10 +108,19 @@ def SVD():
     U = Solve_U(eig_val, eig_vec)
     Sigma = Solve_Sigma(W, eig_val)
     V = Solve_V(W, eig_val, eig_vec)
-    print(V)
     # Solve Ainv and Condition number of A
     # Ainv = Solve_Ainv(Sigma)
     CondNum = Solve_Condition(eig_val)
-
     soln = [U, Sigma, V, CondNum]
     return soln
+
+
+def main():
+    """Main entry point of the app"""
+    J = SVD()
+
+    print(J[0])
+
+
+if __name__ == "__main__":
+    main()
