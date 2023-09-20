@@ -20,13 +20,22 @@ def Enter_matrix():
     """
     n = input("Enter number of rows: \n")
     m = input("Enter number of columns: \n")
-    A = np.zeros([int(n), int(m)], dtype=int)
+    A = np.zeros([int(n), int(m)], dtype=float)
     # Populate matrix A
     for i in range(int(n)):
         for j in range(int(m)):
             val = input("Enter A" + str(i + 1) + str(j + 1) + " value: ")
-            A[i, j] = int(val)
+            A[i, j] = float(val)
     return A
+
+
+def Check_eig(eig_val):
+    """Checks to see if eigen value are positive"""
+    for i in range(len(eig_val)):
+        if eig_val[i] <= 0:
+            return False
+        else:
+            return True
 
 
 def Solve_U(eig_val, eig_vec):
@@ -45,21 +54,18 @@ def Solve_U(eig_val, eig_vec):
     return U
 
 
-def Solve_Sigma(W, eig_val):
+def Solve_Sigma(aat, eig_val):
     """
     calulates the diagonal matrix sigma
 
-    Args: W: A*A^T, eig_val: eigen values
+    Args: aat: A*A^T, eig_val: eigen values
 
     Returns: A matrix Sig (diagnial matrix) containing r elements equal to the root of the positive eigen values
     """
-    Sigma = np.zeros(np.shape(W))
+    Sigma = np.zeros(np.shape(aat))
     # Check for positve eigen values and solve sigma
     for i in range(len(eig_val)):
-        if eig_val[i] <= 0:
-            return "Error Non-Positive or Zero Eigen Value" + str(eig_val[i])
-        else:
-            Sigma[i, i] = math.sqrt(eig_val[i])
+        Sigma[i, i] = math.sqrt(eig_val[i])
     return Sigma
 
 
@@ -67,7 +73,7 @@ def Solve_V(ata):
     """
     calulates the orthonormal matrix V
 
-    Args: A: nxm matrix, eig_val: eigen values, U: orthonormal U matrix
+    Args: ata (A^TA matrix) to calculate eigen values and solve V
 
     Returns: the V matrix
     """
@@ -86,12 +92,13 @@ def Solve_Condition(eig_val):
     return CondNum
 
 
-def Solve_Ainv(Sigma):
+def Solve_Ainv(U, Sigma, V):
     Sigmainv = np.zeros(np.shape(Sigma))
-
     # inverse of matrix Sigma is just the reciprical of the diagonal values in sigma
     for i in range(len(Sigma)):
         Sigmainv[i, i] = 1 / Sigma[i, i]
+    Ainv = np.dot(V, Sigmainv, np.transpose(U))
+    return Ainv
 
 
 def SVD():
@@ -106,15 +113,22 @@ def SVD():
     # Eigen values and vectors
     eig_val, eig_vec = np.linalg.eig(aat)
 
+    # Check for all positive eigen values
+    check_pos = Check_eig(eig_val)
+    if check_pos != True:
+        return "Error Non-Positive or Zero Eigen Value"
+
     # Solve matrices of SVD
-    U = Solve_U(eig_val, eig_vec)
-    Sigma = Solve_Sigma(aat, eig_val)
-    V = Solve_V(ata)
-    # Solve Ainv and Condition number of A
-    # Ainv = Solve_Ainv(Sigma)
-    CondNum = Solve_Condition(eig_val)
     # Multiply matrix U and V by negative one as negative and positive values were swapped due to sorted indices
-    soln = [-U, Sigma, -V, CondNum]
+    U = -Solve_U(eig_val, eig_vec)
+    Sigma = Solve_Sigma(aat, eig_val)
+    V = -Solve_V(ata)
+    print(np.linalg.inv(A))
+    # Solve Ainv and Condition number of A
+    Ainv = Solve_Ainv(U, Sigma, V)
+    CondNum = Solve_Condition(eig_val)
+
+    soln = [U, Sigma, V, CondNum, Ainv]
     return soln
 
 
@@ -122,9 +136,7 @@ def main():
     """Main entry point of the app"""
     J = SVD()
 
-    print(J[0])
-    print(J[1])
-    print(J[2])
+    print(J[4])
 
 
 if __name__ == "__main__":
