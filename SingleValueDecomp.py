@@ -63,7 +63,7 @@ def Solve_Sigma(W, eig_val):
     return Sigma
 
 
-def Solve_V(A, eig_val, U):
+def Solve_V(ata):
     """
     calulates the orthonormal matrix V
 
@@ -71,12 +71,13 @@ def Solve_V(A, eig_val, U):
 
     Returns: the V matrix
     """
-    U_1 = U[:, 0]
-    U_2 = U[:, 1]
-    eig_valrec = 1 / eig_val
-    V_1 = np.dot(eig_valrec, np.transpose(A))
-    V_1 = np.matmul(V_1, U_1)
-    return V_1
+    eig_val, eig_vec = np.linalg.eig(ata)
+    # Sort eigen vectors and value and solve U
+    sorted_indices = np.argsort(eig_val)[::-1]
+    eigenvalues = eig_val[sorted_indices]
+    eigenvectors = eig_vec[:, sorted_indices]
+    V = eigenvectors / np.linalg.norm(eigenvectors, axis=0)
+    return V
 
 
 def Solve_Condition(eig_val):
@@ -100,18 +101,20 @@ def SVD():
     A = Enter_matrix()
     # A^T*A matrix
     AT = np.transpose(A, axes=None)
-    W = np.matmul(AT, A)
+    aat = np.dot(A, AT)
+    ata = np.dot(AT, A)
     # Eigen values and vectors
-    eig_val, eig_vec = np.linalg.eig(W)
+    eig_val, eig_vec = np.linalg.eig(aat)
 
     # Solve matrices of SVD
     U = Solve_U(eig_val, eig_vec)
-    Sigma = Solve_Sigma(W, eig_val)
-    V = Solve_V(W, eig_val, eig_vec)
+    Sigma = Solve_Sigma(aat, eig_val)
+    V = Solve_V(ata)
     # Solve Ainv and Condition number of A
     # Ainv = Solve_Ainv(Sigma)
     CondNum = Solve_Condition(eig_val)
-    soln = [U, Sigma, V, CondNum]
+    # Multiply matrix U and V by negative one as negative and positive values were swapped due to sorted indices
+    soln = [-U, Sigma, -V, CondNum]
     return soln
 
 
@@ -120,6 +123,8 @@ def main():
     J = SVD()
 
     print(J[0])
+    print(J[1])
+    print(J[2])
 
 
 if __name__ == "__main__":
