@@ -38,20 +38,17 @@ def Check_eig(eig_val):
             return True
 
 
-def Solve_U(eig_val, eig_vec):
+def Solve_V(eig_val, eig_vec):
     """
-    calulates the orthonormal matrix U
+    calulates the orthonormal matrix V
 
     Args: eig_val: eigen values, eig_vec: eigen vectors
 
-    Returns: the U matrix
+    Returns: the V matrix
     """
     # Sort eigen vectors and value and solve U
-    sorted_indices = np.argsort(eig_val)[::-1]
-    eigenvalues = eig_val[sorted_indices]
-    eigenvectors = eig_vec[:, sorted_indices]
-    U = eigenvectors / np.linalg.norm(eigenvectors, axis=0)
-    return U
+    V = eig_vec / np.linalg.norm(eig_vec, axis=0)
+    return V
 
 
 def Solve_Sigma(aat, eig_val):
@@ -65,25 +62,24 @@ def Solve_Sigma(aat, eig_val):
     Sigma = np.zeros(np.shape(aat))
     # Check for positve eigen values and solve sigma
     for i in range(len(eig_val)):
-        Sigma[i, i] = math.sqrt(eig_val[i])
+        Sigma[i, i] = math.sqrt(eig_val[i - 1])
     return Sigma
 
 
-def Solve_V(ata):
+def Solve_U(eig_val, eig_vec):
     """
-    calulates the orthonormal matrix V
+    calulates the orthonormal matrix U
 
-    Args: ata (A^TA matrix) to calculate eigen values and solve V
+    Args: Eigen values and eigen vectors
 
-    Returns: the V matrix
+    Returns: the U matrix
     """
-    eig_val, eig_vec = np.linalg.eig(ata)
     # Sort eigen vectors and value and solve U
     sorted_indices = np.argsort(eig_val)[::-1]
     eigenvalues = eig_val[sorted_indices]
     eigenvectors = eig_vec[:, sorted_indices]
-    V = eigenvectors / np.linalg.norm(eigenvectors, axis=0)
-    return V
+    U = eigenvectors / np.linalg.norm(eigenvectors, axis=0)
+    return U
 
 
 def Solve_Ainv(U, Sigma, V):
@@ -111,7 +107,8 @@ def SVD():
     aat = np.dot(A, AT)
     ata = np.dot(AT, A)
     # Eigen values and vectors
-    eig_val, eig_vec = np.linalg.eig(aat)
+    eig_val, eig_vec = np.linalg.eig(ata)
+    eig_val1, eig_vec1 = np.linalg.eig(aat)
 
     # Check for all positive eigen values
     check_pos = Check_eig(eig_val)
@@ -120,23 +117,20 @@ def SVD():
 
     # Solve matrices of SVD
     # Multiply matrix U and V by negative one as negative and positive values were swapped due to sorted indices
-    U = -Solve_U(eig_val, eig_vec)
+    U = -Solve_U(eig_val1, eig_vec1)
     Sigma = Solve_Sigma(aat, eig_val)
-    V = -Solve_V(ata)
-    print(np.linalg.inv(A))
+    V = -Solve_V(eig_val, eig_vec)
     # Solve Ainv and Condition number of A
-    Ainv = Solve_Ainv(U, Sigma, V)
-    CondNum = Solve_Condition(A, Ainv)
-
-    soln = [U, Sigma, V, CondNum, Ainv]
+    CondNum = Solve_Condition(A, np.linalg.inv(A))
+    soln = [U, Sigma, V, CondNum]
     return soln
 
 
 def main():
     """Main entry point of the app"""
     J = SVD()
-
-    print(J[3])
+    print(J[2])
+    print(J[0])
 
 
 if __name__ == "__main__":
