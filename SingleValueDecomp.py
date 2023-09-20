@@ -86,12 +86,6 @@ def Solve_V(ata):
     return V
 
 
-def Solve_Condition(eig_val):
-    # condition number is ||A||_2 * ||A^-1||_2 or |Lamda_max|/|Lamda_min|
-    CondNum = np.max(eig_val) / np.min(eig_val)
-    return CondNum
-
-
 def Solve_Ainv(U, Sigma, V):
     Sigmainv = np.zeros(np.shape(Sigma))
     # inverse of matrix Sigma is just the reciprical of the diagonal values in sigma
@@ -99,6 +93,12 @@ def Solve_Ainv(U, Sigma, V):
         Sigmainv[i, i] = 1 / Sigma[i, i]
     Ainv = np.dot(V, Sigmainv, np.transpose(U))
     return Ainv
+
+
+def Solve_Condition(A, Ainv):
+    # condition number is ||A||_2 * ||A^-1||_2 or |Lamda_max|/|Lamda_min|
+    CondNum = np.linalg.norm(A, 2) * np.linalg.norm(Ainv, 2)
+    return CondNum
 
 
 def SVD():
@@ -126,7 +126,7 @@ def SVD():
     print(np.linalg.inv(A))
     # Solve Ainv and Condition number of A
     Ainv = Solve_Ainv(U, Sigma, V)
-    CondNum = Solve_Condition(eig_val)
+    CondNum = Solve_Condition(A, Ainv)
 
     soln = [U, Sigma, V, CondNum, Ainv]
     return soln
@@ -136,7 +136,7 @@ def main():
     """Main entry point of the app"""
     J = SVD()
 
-    print(J[4])
+    print(J[3])
 
 
 if __name__ == "__main__":
