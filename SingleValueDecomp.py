@@ -51,7 +51,7 @@ def Solve_V(eig_val, eig_vec):
     return V
 
 
-def Solve_Sigma(aat, eig_val):
+def Solve_Sigma(eig_val):
     """
     calulates the diagonal matrix sigma
 
@@ -59,10 +59,12 @@ def Solve_Sigma(aat, eig_val):
 
     Returns: A matrix Sig (diagnial matrix) containing r elements equal to the root of the positive eigen values
     """
-    Sigma = np.zeros(np.shape(aat))
     # Check for positve eigen values and solve sigma
-    for i in range(len(eig_val)):
-        Sigma[i, i] = math.sqrt(eig_val[i - 1])
+    sorted_indices = np.argsort(eig_val)[::-1]
+    eig_val = eig_val[sorted_indices]
+    sing_vals = np.sqrt(eig_val)
+    Sigma = np.diag(sing_vals)
+
     return Sigma
 
 
@@ -117,9 +119,9 @@ def SVD():
 
     # Solve matrices of SVD
     # Multiply matrix U and V by negative one as negative and positive values were swapped due to sorted indices
-    U = -Solve_U(eig_val1, eig_vec1)
-    Sigma = Solve_Sigma(aat, eig_val)
-    V = -Solve_V(eig_val, eig_vec)
+    U = Solve_U(eig_val1, eig_vec1)
+    Sigma = Solve_Sigma(eig_val)
+    V = Solve_V(eig_val, eig_vec)
     # Solve Ainv and Condition number of A
     CondNum = Solve_Condition(A, np.linalg.inv(A))
     soln = [U, Sigma, V, CondNum]
@@ -129,8 +131,7 @@ def SVD():
 def main():
     """Main entry point of the app"""
     J = SVD()
-    print(J[2])
-    print(J[0])
+    print(J)
 
 
 if __name__ == "__main__":
