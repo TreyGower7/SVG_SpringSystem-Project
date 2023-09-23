@@ -81,5 +81,5 @@ def SVD():
     # Construct the V matrix by taking the transpose of Vt
     V = Vt.T
 
-    soln = [U, Sigma, V, Ainverse, CondNum]
+    soln = [U, Sigma, V, Ainverse, CondNum, A]
     return soln
