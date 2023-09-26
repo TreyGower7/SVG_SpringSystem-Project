@@ -32,21 +32,24 @@ def input_data():
         )
 
     # List of dict list
-    data = [{"K": K}, {"M": M}, {"B_conds": B_conds}]
+    data = [K, M, B_conds]
     return data
 
 
-def elongation():
+# def elongation():
 
-def internal_force():
+# def internal_force():
 
-def force_balance():
+# def force_balance():
 
 
 def main():
     """Comparing Svd black box and my algorithm"""
     J = input_data()
-    print(J)
+    C = np.zeros(np.shape(len(J[0])))
+    # for i in range(J['K'].size())
+    # C = np.diag()
+    print(C)
 
 
 if __name__ == "__main__":
