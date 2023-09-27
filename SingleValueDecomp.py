@@ -45,11 +45,12 @@ def Solve_Condition(A, Ainverse):
     return CondNum
 
 
-def SVD():
+def SVD(A):
     """
     Returns a dictionary of all SVD matrices, condition number and the inverse given by A^-1= V*Sigma^{-1}*U^T
     """
-    A = Enter_matrix()
+    if A is None:
+        A = Enter_matrix()
 
     # Compute A^T * A and A * A^T
     ATA = np.dot(A.T, A)

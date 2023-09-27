@@ -1,5 +1,5 @@
 import numpy as np
-import SingleValueDecomp as svdsoln
+import SingleValueDecomp as SVDSoln
 
 
 def input_data():
@@ -45,7 +45,7 @@ def internal_force(K, u):
     return C
 
 
-def force_balance(M, K, Kinv, B_conds):
+def force_balance(M, Kinv, B_conds):
     # calculate force vector
     f = np.array(M) * (9.81)  # [m/s^2]
     # obtain inverse of K with svd decomposition
@@ -60,18 +60,18 @@ def force_balance(M, K, Kinv, B_conds):
     # Fixed/Free case
     if B_conds == 2:
         # first u is 0
-        u[0] = 0
+        np.delete(u, 0)
     # Fixed/Fixed case
     else:
         # last and first u are 0
-        u[0] = 0
-        u[-1] = 0
+        np.delete(u, 0)
+        np.delete(u, -1)
 
     return u
 
 
 # creating the stiffness matrix
-def create_K(C):
+def create_Kmat(C):
     K = np.zeros(np.shape(C))
 
     for i in range(len(K)):
@@ -98,15 +98,16 @@ def main():
     C = np.array(J[0])
     C = np.diag(C)
     # calculate K stiffness matrix
-    K = create_K(C)
+    K = create_Kmat(C)
     # Svd decomposition of K into ???
-    SVDvals = svdsoln(K)
+    SVDvals = SVDSoln.SVD(K)
     Kinv = SVDvals[3]
     # calculate u vector based on f vector and K matrix
-    u = force_balance(J[1], K, Kinv, J[2])
+    u = force_balance(J[1], Kinv, J[2])
     # calculate internal force vector w
     # w = internal_force(J[0],u)
-    print(K)
+
+    print(u)
 
 
 if __name__ == "__main__":
