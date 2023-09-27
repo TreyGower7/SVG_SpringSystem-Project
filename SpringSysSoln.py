@@ -79,12 +79,12 @@ def create_K(C):
     for i in range(len(K)):
         for j in range(len(K)):
             if j == i + 1 or i == j + 1:
-                K[i, j] = -C[i]
+                K[i, j] = -C[i, i]
             if i == j:
                 if j == 1 or j == len(K):
-                    K[i, j] = C[i]
+                    K[i, j] = C[i, i]
                 else:
-                    K[i, j] = C[i - 1] + C[i]
+                    K[i, j] = C[i - 1, i - 1] + C[i, i]
     return K
 
 
@@ -94,7 +94,7 @@ def main():
 
     #    Make our Spring constant diagonal matrix
     C = np.array(J[0])
-    # C = np.diag(C)
+    C = np.diag(C)
 
     # calculate A matrix based on displacement vector u
     # A = force_balance(J[1], J[0])
