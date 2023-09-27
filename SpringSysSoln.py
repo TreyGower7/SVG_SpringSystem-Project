@@ -35,53 +35,56 @@ def input_data():
     return data
 
 
-# Creating a difference matrix
-def Make_A(B_conds, K):
-    # Free/Free case#
-    if B_conds == 3:
-        u = np.zeros(np.shape(K))
-        print(u)
-        for i in range(len(K)):
-            u[i] = sp.symbols("u" + str(i))
-    # Fixed/Free case
-    if B_conds == 2:
-        u = np.zeros(np.shape(K - 1))
-
-    # Fixed/Fixed case
-    else:
-        u = np.zeros(np.shape(K - 2))
-    return u
-
-
 # def elongation():
 
 
-def internal_force(K):
+def internal_force(K, u):
     # Make our Spring constant diagonal matrix
     C = np.array(K)
     C = diag(C)
     return C
 
 
-def force_balance(M, K):
+def force_balance(M, K, Kinv, B_conds):
     # calculate force vector
     f = np.array(M) * (9.81)  # [m/s^2]
+    # obtain inverse of K with svd decomposition
 
     u = np.dot(f, Kinv)
+
+    # Now to adjust u for boundary conditions
+    # Free/Free case
+    if B_conds == 3:
+        # no action necessary for free/free
+        return u
+    # Fixed/Free case
+    if B_conds == 2:
+        # first u is 0
+        u[0] = 0
+    # Fixed/Fixed case
+    else:
+        # last and first u are 0
+        u[0] = 0
+        u[-1] = 0
 
     return u
 
 
-# creating the stifness matrix
+# creating the stiffness matrix
 def create_K(C):
     K = np.zeros(np.shape(C))
 
     for i in range(len(K)):
         for j in range(len(K)):
-            if j == i + 1 or i == j + 1:
+            # populate stiffness below main diagonal
+            if j == i + 1:
                 K[i, j] = -C[i, i]
+            # populate stiffness to the right of main diagonal
+            if i == j + 1:
+                K[i, j] = -C[j, j]
+            # populate main diagonal
             if i == j:
-                if j == 1 or j == len(K):
+                if j == 0 or j == len(K):
                     K[i, j] = C[i, i]
                 else:
                     K[i, j] = C[i - 1, i - 1] + C[i, i]
@@ -89,18 +92,20 @@ def create_K(C):
 
 
 def main():
-    """Comparing Svd black box and my algorithm"""
+    """Solve Ku=f"""
     J = input_data()
 
-    #    Make our Spring constant diagonal matrix
     C = np.array(J[0])
     C = np.diag(C)
-
-    # calculate A matrix based on displacement vector u
-    # A = force_balance(J[1], J[0])
+    # calculate K stiffness matrix
     K = create_K(C)
-    # calculate internal force vector w to substitute
-    # w = internal_force(J[0])
+    # Svd decomposition of K into ???
+    SVDvals = svdsoln(K)
+    Kinv = SVDvals[3]
+    # calculate u vector based on f vector and K matrix
+    u = force_balance(J[1], K, Kinv, J[2])
+    # calculate internal force vector w
+    # w = internal_force(J[0],u)
     print(K)
 
 
