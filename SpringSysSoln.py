@@ -107,7 +107,7 @@ def main():
     # calculate internal force vector w
     # w = internal_force(J[0],u)
 
-    print(u)
+    print(K)
 
 
 if __name__ == "__main__":
