@@ -22,7 +22,7 @@ def input_data():
     for i in range(num_K):
         K.append(int(input("Enter Spring constant K" + str(i + 1) + "[N/m]: ")))
         # ensuring only #M=#K or #M=#K+1
-        if i <= num_M:
+        if i < num_M:
             M.append(int(input("Enter Mass m" + str(i + 1) + "[kg]: ")))
 
     # enter boundary conditions
@@ -63,27 +63,45 @@ def internal_force(K):
     return C
 
 
-def force_balance(M):
+def force_balance(M, K):
     # calculate force vector
     f = np.array(M) * (9.81)  # [m/s^2]
 
-    # u = np.dot(f, Ainv)
-    return f
+    u = np.dot(f, Kinv)
+
+    return u
+
+
+# creating the stifness matrix
+def create_K(C):
+    K = np.zeros(np.shape(C))
+
+    for i in range(len(K)):
+        for j in range(len(K)):
+            if j == i + 1 or i == j + 1:
+                K[i, j] = -C[i]
+            if i == j:
+                if j == 1 or j == len(K):
+                    K[i, j] = C[i]
+                else:
+                    K[i, j] = C[i - 1] + C[i]
+    return K
 
 
 def main():
     """Comparing Svd black box and my algorithm"""
     J = input_data()
 
-    # Make our A matrix based on boundary conditions and using spring constant dimensions
-    # A = Make_A(J[2], J[0])
+    #    Make our Spring constant diagonal matrix
+    C = np.array(J[0])
+    # C = np.diag(C)
 
-    # calculate displacement vector u to substitute
-    u = force_balance(J[1])
-
+    # calculate A matrix based on displacement vector u
+    # A = force_balance(J[1], J[0])
+    K = create_K(C)
     # calculate internal force vector w to substitute
-    w = internal_force(J[0])
-    print(w)
+    # w = internal_force(J[0])
+    print(K)
 
 
 if __name__ == "__main__":
