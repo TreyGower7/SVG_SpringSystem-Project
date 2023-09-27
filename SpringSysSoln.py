@@ -31,25 +31,59 @@ def input_data():
             "Enter Boundary conditions (1)Fixed/Fixed (2)Fixed/Free (3)Free/Free: "
         )
 
-    # List of dict list
     data = [K, M, B_conds]
     return data
 
 
+# Creating a difference matrix
+def Make_A(B_conds, K):
+    # Free/Free case#
+    if B_conds == 3:
+        u = np.zeros(np.shape(K))
+        print(u)
+        for i in range(len(K)):
+            u[i] = sp.symbols("u" + str(i))
+    # Fixed/Free case
+    if B_conds == 2:
+        u = np.zeros(np.shape(K - 1))
+
+    # Fixed/Fixed case
+    else:
+        u = np.zeros(np.shape(K - 2))
+    return u
+
+
 # def elongation():
 
-# def internal_force():
 
-# def force_balance():
+def internal_force(K):
+    # Make our Spring constant diagonal matrix
+    C = np.array(K)
+    C = diag(C)
+    return C
+
+
+def force_balance(M):
+    # calculate force vector
+    f = np.array(M) * (9.81)  # [m/s^2]
+
+    # u = np.dot(f, Ainv)
+    return f
 
 
 def main():
     """Comparing Svd black box and my algorithm"""
     J = input_data()
-    C = np.zeros(np.shape(len(J[0])))
-    # for i in range(J['K'].size())
-    # C = np.diag()
-    print(C)
+
+    # Make our A matrix based on boundary conditions and using spring constant dimensions
+    # A = Make_A(J[2], J[0])
+
+    # calculate displacement vector u to substitute
+    u = force_balance(J[1])
+
+    # calculate internal force vector w to substitute
+    w = internal_force(J[0])
+    print(w)
 
 
 if __name__ == "__main__":
