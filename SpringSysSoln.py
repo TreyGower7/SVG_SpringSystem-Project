@@ -76,22 +76,21 @@ def force_balance(M, Kinv, B_conds):
 
 # creating the stiffness matrix
 def create_Kmat(C):
-    K = np.zeros(np.shape(C))
+    n = np.shape(C)
+    n = int(n[0]) - 1
+    K = np.array(np.shape(n))
 
-    for i in range(len(K)):
-        for j in range(len(K)):
+    for i in range(1, len(K)):
+        for j in range(1, len(K)):
             # populate stiffness below main diagonal
             if j == i + 1:
-                K[i, j] = -C[i, i]
+                K[i - 1, j - 1] = -C[i - 1, i - 1]
             # populate stiffness to the right of main diagonal
             if i == j + 1:
-                K[i, j] = -C[j, j]
+                K[i - 1, j - 1] = -C[j - 1, j - 1]
             # populate main diagonal
             if i == j:
-                if j == 0 or j == len(K):
-                    K[i, j] = C[i, i]
-                else:
-                    K[i, j] = C[i - 1, i - 1] + C[i, i]
+                K[i - 1, j - 1] = C[i - 1, i - 1] + C[i, i]
     return K
 
 
