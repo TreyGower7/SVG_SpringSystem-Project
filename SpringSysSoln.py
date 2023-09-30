@@ -48,26 +48,21 @@ def internal_force(K, u):
 def force_balance(M, Kinv, B_conds):
     # calculate force vector
     f = np.array(M) * (9.81)  # [m/s^2]
-    # obtain inverse of K with svd decomposition
-
-    u = np.dot(f, Kinv)
 
     # Now to adjust u for boundary conditions
-    # Free/Free case
-    if B_conds == 3:
-        # no action necessary for free/free
-        return u
-    # Fixed/Free case
-    if B_conds == 2:
-        # first u is 0
-        np.delete(u, 0)
     # Fixed/Fixed case
-    else:
+    if B_conds != 2 or B_conds != 3:
         # last and first u are 0
-        np.delete(u, 0)
-        np.delete(u, -1)
+        u = np.array([[0, 0]])
+    # Fixed/Free case
+    if B_conds != 3 or B_conds != 1:
+        # first u is 0
+        u = np.array([[0]])
 
-    return u
+    u_new = np.dot(f, Kinv)
+    u_actual = np.insert(u, 1, u_new)
+
+    return u_actual
 
 
 # creating the stiffness matrix
@@ -107,7 +102,7 @@ def main():
     # calculate internal force vector w
     # w = internal_force(J[0],u)
 
-    print(K)
+    print(u)
 
 
 if __name__ == "__main__":
