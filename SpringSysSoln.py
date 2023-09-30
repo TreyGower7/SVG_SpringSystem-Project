@@ -35,14 +35,20 @@ def input_data():
     return data
 
 
-# def elongation():
+def elongation(u, m):
+    # initialize e as an mx1 column vector
+    e = np.array(np.zeros((int(m), 1)))
+    print(e)
+    # create elongation vector from u values and based on boundary conditions
+    for i in range(1, len(u)):
+        e[i - 1] = u[i] - u[i - 1]
+
+    return e
 
 
-def internal_force(K, u):
-    # Make our Spring constant diagonal matrix
-    C = np.array(K)
-    C = diag(C)
-    return C
+# def internal_force(K, u):
+
+#  return C
 
 
 def force_balance(M, Kinv, B_conds):
@@ -92,20 +98,23 @@ def main():
     """Solve Ku=f"""
     J = input_data()
     B_conds = int(J[2])
+    # diagonal matrix of spring constants
     C = np.array(J[0])
     C = np.diag(C)
     # calculate K stiffness matrix
     K = create_Kmat(C)
     # Svd decomposition of K into ???
     SVDvals = SVDSoln.SVD(K)
+    # Kinv from SVD
     Kinv = SVDvals[3]
-    # calculate u vector based on f vector and K matrix
+    # calculate u vector based on f vector and Kinv matrix
     u = force_balance(J[1], Kinv, B_conds)
-    # calculate internal force vector w
-
+    # calculate elongation vector e by back substituting u
+    e = elongation(u, len(J[0]))
+    # calculate internal force vector w by back substituting e
     # w = internal_force(J[0],u)
 
-    print(u)
+    print(e)
 
 
 if __name__ == "__main__":
