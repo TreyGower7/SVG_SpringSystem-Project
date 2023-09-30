@@ -48,21 +48,23 @@ def internal_force(K, u):
 def force_balance(M, Kinv, B_conds):
     # calculate force vector
     f = np.array(M) * (9.81)  # [m/s^2]
+    u = np.dot(f, Kinv)
 
     # Now to adjust u for boundary conditions
-    # Fixed/Fixed case
-    if B_conds != 2 or B_conds != 3:
-        # last and first u are 0
-        u = np.array([[0, 0]])
     # Fixed/Free case
-    if B_conds != 3 or B_conds != 1:
+    if B_conds == 2:
         # first u is 0
-        u = np.array([[0]])
+        u = np.insert(u, 0, 0)
+    # Fixed/Fixed case
+    if B_conds == 1:
+        # last and first u are 0
+        u = np.insert(u, 0, 0)
+        u = np.append(u, 0)
+    # free/free case needs no adjustment
+    else:
+        return u
 
-    u_new = np.dot(f, Kinv)
-    u_actual = np.insert(u, 1, u_new)
-
-    return u_actual
+    return u
 
 
 # creating the stiffness matrix
@@ -89,7 +91,7 @@ def create_Kmat(C):
 def main():
     """Solve Ku=f"""
     J = input_data()
-
+    B_conds = int(J[2])
     C = np.array(J[0])
     C = np.diag(C)
     # calculate K stiffness matrix
@@ -98,8 +100,9 @@ def main():
     SVDvals = SVDSoln.SVD(K)
     Kinv = SVDvals[3]
     # calculate u vector based on f vector and K matrix
-    u = force_balance(J[1], Kinv, J[2])
+    u = force_balance(J[1], Kinv, B_conds)
     # calculate internal force vector w
+
     # w = internal_force(J[0],u)
 
     print(u)
