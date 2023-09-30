@@ -54,6 +54,7 @@ def elongation(u, m):
 def force_balance(M, Kinv, B_conds):
     # calculate force vector
     f = np.array(M) * (9.81)  # [m/s^2]
+    print(f)
     u = np.dot(f, Kinv)
 
     # Now to adjust u for boundary conditions
@@ -103,6 +104,7 @@ def main():
     C = np.diag(C)
     # calculate K stiffness matrix
     K = create_Kmat(C)
+    print(K)
     # Svd decomposition of K into ???
     SVDvals = SVDSoln.SVD(K)
     # Kinv from SVD
@@ -113,8 +115,6 @@ def main():
     e = elongation(u, len(J[0]))
     # calculate internal force vector w by back substituting e
     # w = internal_force(J[0],u)
-
-    print(e)
 
 
 if __name__ == "__main__":
