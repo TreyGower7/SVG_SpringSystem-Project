@@ -75,22 +75,20 @@ def force_balance(M, Kinv, B_conds):
 
 
 # creating the stiffness matrix
-def create_Kmat(C):
-    n = np.shape(C)
-    n = int(n[0]) - 1
-    K = np.array(np.shape(n))
-
-    for i in range(1, len(K)):
-        for j in range(1, len(K)):
+def create_Kmat(n):
+    m = int(len(n)) - 1
+    K = np.zeros((int(m), int(m)))
+    for i in range(1, len(K) + 1):
+        for j in range(1, len(K) + 1):
             # populate stiffness below main diagonal
             if j == i + 1:
-                K[i - 1, j - 1] = -C[i - 1, i - 1]
+                K[i - 1, j - 1] = -n[i]
             # populate stiffness to the right of main diagonal
             if i == j + 1:
-                K[i - 1, j - 1] = -C[j - 1, j - 1]
+                K[i - 1, j - 1] = -n[j]
             # populate main diagonal
             if i == j:
-                K[i - 1, j - 1] = C[i - 1, i - 1] + C[i, i]
+                K[i - 1, j - 1] = n[i - 1] + n[i]
     return K
 
 
@@ -98,12 +96,9 @@ def main():
     """Solve Ku=f"""
     J = input_data()
     B_conds = int(J[2])
-    # diagonal matrix of spring constants
-    C = np.array(J[0])
-    C = np.diag(C)
+
     # calculate K stiffness matrix
-    K = create_Kmat(C)
-    print(K)
+    K = create_Kmat(J[0])
     # Svd decomposition of K into ???
     SVDvals = SVDSoln.SVD(K)
     # Kinv from SVD

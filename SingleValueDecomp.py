@@ -32,10 +32,10 @@ def Enter_matrix():
 def Check_eig(eig_val):
     """Checks to see if eigen value are positive"""
     for i in range(len(eig_val)):
-        if eig_val[i] >= 0:
+        if eig_val[i] > 0:
             continue
         else:
-            raise Exception("Error Non-Positive Eigen value")
+            raise Exception("Error Zero or Non-Positive Eigen value")
     return 1
 
 
