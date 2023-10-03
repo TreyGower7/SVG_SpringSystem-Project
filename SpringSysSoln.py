@@ -51,19 +51,20 @@ def elongation(u, m):
 #  return C
 
 
-def force_balance(M, Kinv, B_conds):
+def force_balance(M, Kinv):
     # calculate force vector
     f = np.array(M) * (9.81)  # [m/s^2]
-    print(f)
+
     u = np.dot(f, Kinv)
 
     return u
 
 
 # creating the stiffness matrix
-def create_Kmat(Kvec, Mvec):
+def create_Kmat(Kvec, Mvec, B_conds):
     m = int(len(Kvec))
-    K = np.zeros(m, m)
+    K = np.zeros((m, m))
+
     for i in range(len(K)):
         for j in range(len(K)):
             # populate stiffness below main diagonal
@@ -77,21 +78,26 @@ def create_Kmat(Kvec, Mvec):
                 if j == 0 or j == len(K):
                     K[i, j] = Kvec[i]
                 else:
-                    K[i, j] = num_k[i - 1] + num[i]
-        # Free/Free case
-    if B_conds == 3:
-        # no action necessary for free/free
-        return K
+                    K[i, j] = Kvec[i - 1] + Kvec[i]
+    # Free/Free case
+    if int(B_conds) == 3:
+        # no action necessary for free/free\
+        K_new = K
+        M_new = Mvec
     # Fixed/Free case
-    if B_conds == 2:
+    if int(B_conds) == 2:
         # first K row and column is deleted and force for that K deleted
-        
+        K_new = K[1:, 1:]
+        M_new = Mvec[1:]
     # Fixed/Fixed case
-    else:
-        # first K row and column is deleted and force for that K deleted
-        u[0] = 0
-        u[-1] = 0
-    return K
+    if int(B_conds) == 1:
+        # first and last K row and column is deleted and force for that K deleted
+        K_new = K[1:, 1:]
+        K_new = K[:-1, :-1]
+        M_new = Mvec[1:]
+        M_new = Mvec[:-1]
+
+    return [K_new, M_new]
 
 
 def main():
@@ -100,17 +106,21 @@ def main():
     B_conds = int(J[2])
 
     # calculate K stiffness matrix
-    K = create_Kmat(J[0], J[1])
+    K = create_Kmat(J[0], J[1], J[2])
+    M = K[1]
+    K = K[0]
     # Svd decomposition of K into ???
     SVDvals = SVDSoln.SVD(K)
     # Kinv from SVD
     Kinv = SVDvals[3]
+    # new M updated for Bound conditions from Create_Kmat func
     # calculate u vector based on f vector and Kinv matrix
-    u = force_balance(J[1], Kinv, B_conds)
+    u = force_balance(M, Kinv)
     # calculate elongation vector e by back substituting u
-    e = elongation(u, len(J[0]))
+    # e = elongation(u, len(J[0]))
     # calculate internal force vector w by back substituting e
     # w = internal_force(J[0],u)
+    print(K)
 
 
 if __name__ == "__main__":
