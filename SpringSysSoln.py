@@ -14,9 +14,9 @@ def input_data():
     num_K = int(input("How many springs: "))
     num_M = int(input("How many masses: "))
 
-    # Check to ensure the system is solvable
+    # Check to ensure the system is solvable with at most one more mass than spring or vice versa
     if num_K != num_M:
-        if num_K != num_M + 1:
+        if num_K > num_M + 1 or num_M > num_K + 1:
             raise Exception("Two little or too many springs entered")
     # Input spring constants and mass values
     for i in range(num_K):
@@ -57,38 +57,40 @@ def force_balance(M, Kinv, B_conds):
     print(f)
     u = np.dot(f, Kinv)
 
-    # Now to adjust u for boundary conditions
-    # Fixed/Free case
-    if B_conds == 2:
-        # first u is 0
-        u = np.insert(u, 0, 0)
-    # Fixed/Fixed case
-    if B_conds == 1:
-        # last and first u are 0
-        u = np.insert(u, 0, 0)
-        u = np.append(u, 0)
-    # free/free case needs no adjustment
-    else:
-        return u
-
     return u
 
 
 # creating the stiffness matrix
-def create_Kmat(n):
-    m = int(len(n)) - 1
-    K = np.zeros((int(m), int(m)))
-    for i in range(1, len(K) + 1):
-        for j in range(1, len(K) + 1):
+def create_Kmat(Kvec, Mvec):
+    m = int(len(Kvec))
+    K = np.zeros(m, m)
+    for i in range(len(K)):
+        for j in range(len(K)):
             # populate stiffness below main diagonal
             if j == i + 1:
-                K[i - 1, j - 1] = -n[i]
+                K[i, j] = -Kvec[i]
             # populate stiffness to the right of main diagonal
             if i == j + 1:
-                K[i - 1, j - 1] = -n[j]
+                K[i, j] = -Kvec[j]
             # populate main diagonal
             if i == j:
-                K[i - 1, j - 1] = n[i - 1] + n[i]
+                if j == 0 or j == len(K):
+                    K[i, j] = Kvec[i]
+                else:
+                    K[i, j] = num_k[i - 1] + num[i]
+        # Free/Free case
+    if B_conds == 3:
+        # no action necessary for free/free
+        return K
+    # Fixed/Free case
+    if B_conds == 2:
+        # first K row and column is deleted and force for that K deleted
+        
+    # Fixed/Fixed case
+    else:
+        # first K row and column is deleted and force for that K deleted
+        u[0] = 0
+        u[-1] = 0
     return K
 
 
@@ -98,7 +100,7 @@ def main():
     B_conds = int(J[2])
 
     # calculate K stiffness matrix
-    K = create_Kmat(J[0])
+    K = create_Kmat(J[0], J[1])
     # Svd decomposition of K into ???
     SVDvals = SVDSoln.SVD(K)
     # Kinv from SVD
