@@ -60,11 +60,14 @@ def force_balance(M, Kinv, B_conds):
 
 # creating the stiffness matrix
 def create_Kmat(Kvec, Mvec, B_conds):
-    # ensuring for free free system force vector and K matrix have compatibility
-    if len(Kvec) < len(Mvec):
+    # boundary condition for this should be Fixed/free
+    if len(Mvec) == len(Kvec):
         Kvec = np.append(Kvec, Kvec[-1])
+
     m = int(len(Kvec))
     K = np.zeros((m, m))
+
+    # populate diagnol
     for i in range(m):
         if i == 0 or i == m - 1:
             K[i, i] = Kvec[i]
@@ -110,6 +113,13 @@ def main():
     SVDvals = SVDSoln.SVD(K)
     # Kinv from SVD
     Kinv = SVDvals[3]
+    if SVDvals[4] >= 100:
+        print(
+            "Condition Number of K: "
+            + str(SVDvals[4])
+            + " is too high and K is ill-conditioned"
+        )
+        exit()
     print("Condition Number of K: " + str(SVDvals[4]))
     print("")
     print("Singular Values of K: " + str(SVDvals[1]))
