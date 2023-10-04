@@ -20,10 +20,10 @@ def input_data():
             raise Exception("Two little or too many springs entered")
     # Input spring constants and mass values
     for i in range(num_K):
-        K.append(int(input("Enter Spring constant K" + str(i + 1) + "[N/m]: ")))
-        # ensuring only #M=#K or #M=#K+1
-        if i < num_M:
-            M.append(int(input("Enter Mass m" + str(i + 1) + "[kg]: ")))
+        K.append(float(input("Enter Spring constant K" + str(i + 1) + "[N/m]: ")))
+
+    for i in range(num_M):
+        M.append(float(input("Enter Mass m" + str(i + 1) + "[kg]: ")))
 
     # enter boundary conditions
     while int(B_conds) < 1 or int(B_conds) > 3:
@@ -62,26 +62,26 @@ def force_balance(M, Kinv):
 
 # creating the stiffness matrix
 def create_Kmat(Kvec, Mvec, B_conds):
-    m = int(len(Kvec))
+    m = int(len(Mvec))
     K = np.zeros((m, m))
 
-    for i in range(len(K)):
-        for j in range(len(K)):
-            # populate stiffness below main diagonal
-            if j == i + 1:
-                K[i, j] = -Kvec[i]
-            # populate stiffness to the right of main diagonal
-            if i == j + 1:
-                K[i, j] = -Kvec[j]
-            # populate main diagonal
-            if i == j:
-                if j == 0 or j == len(K):
-                    K[i, j] = Kvec[i]
-                else:
-                    K[i, j] = Kvec[i - 1] + Kvec[i]
+    if len(Kvec) < len(Mvec):
+        Kvec = np.append(Kvec, Kvec[-1])
+
+    for i in range(m):
+        if i == 0 or i == m - 1:
+            K[i, i] = Kvec[i]
+        else:
+            K[i, i] = Kvec[i - 1] + Kvec[i]
+
+    # Populate the off-diagonal elements (negative spring constants)
+    for i in range(m - 1):
+        K[i, i + 1] = -Kvec[i]
+        K[i + 1, i] = -Kvec[i]
+
     # Free/Free case
     if int(B_conds) == 3:
-        # no action necessary for free/free\
+        # no action necessary for free/free
         K_new = K
         M_new = Mvec
     # Fixed/Free case
@@ -120,7 +120,6 @@ def main():
     # e = elongation(u, len(J[0]))
     # calculate internal force vector w by back substituting e
     # w = internal_force(J[0],u)
-    print(K)
 
 
 if __name__ == "__main__":

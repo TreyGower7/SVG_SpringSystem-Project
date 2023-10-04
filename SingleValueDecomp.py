@@ -35,7 +35,7 @@ def Check_eig(eig_val):
         if eig_val[i] > 0:
             continue
         else:
-            raise Exception("Error Zero or Non-Positive Eigen value")
+            exit("Error Zero or Non-Positive Eigen value")
     return 1
 
 
