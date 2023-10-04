@@ -38,8 +38,7 @@ def input_data():
 def elongation(u, m):
     # initialize e as an mx1 column vector
     e = np.array(np.zeros((int(m), 1)))
-    print(e)
-    # create elongation vector from u values and based on boundary conditions
+    # create elongation vector from u values
     for i in range(1, len(u)):
         e[i - 1] = u[i] - u[i - 1]
 
@@ -51,10 +50,9 @@ def elongation(u, m):
 #  return C
 
 
-def force_balance(M, Kinv):
+def force_balance(M, Kinv, B_conds):
     # calculate force vector
     f = np.array(M) * (9.81)  # [m/s^2]
-
     u = np.dot(f, Kinv)
 
     return u
@@ -115,11 +113,14 @@ def main():
     Kinv = SVDvals[3]
     # new M updated for Bound conditions from Create_Kmat func
     # calculate u vector based on f vector and Kinv matrix
-    u = force_balance(M, Kinv)
+    u = force_balance(M, Kinv, J[2])
     # calculate elongation vector e by back substituting u
-    # e = elongation(u, len(J[0]))
+    e = elongation(u, len(J[0]))
     # calculate internal force vector w by back substituting e
     # w = internal_force(J[0],u)
+    print(K)
+    print(u)
+    print(e)
 
 
 if __name__ == "__main__":
