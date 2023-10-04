@@ -60,12 +60,11 @@ def force_balance(M, Kinv, B_conds):
 
 # creating the stiffness matrix
 def create_Kmat(Kvec, Mvec, B_conds):
-    m = int(len(Mvec))
-    K = np.zeros((m, m))
-
+    # ensuring for free free system force vector and K matrix have compatibility
     if len(Kvec) < len(Mvec):
         Kvec = np.append(Kvec, Kvec[-1])
-
+    m = int(len(Kvec))
+    K = np.zeros((m, m))
     for i in range(m):
         if i == 0 or i == m - 1:
             K[i, i] = Kvec[i]
@@ -111,16 +110,22 @@ def main():
     SVDvals = SVDSoln.SVD(K)
     # Kinv from SVD
     Kinv = SVDvals[3]
+    print("Condition Number of K: " + str(SVDvals[4]))
+    print("")
+    print("Singular Values of K: " + str(SVDvals[1]))
+    print("")
+    print("Eigen Values of K: " + str(np.power(2, SVDvals[1])))
+    print("")
     # new M updated for Bound conditions from Create_Kmat func
     # calculate u vector based on f vector and Kinv matrix
-    u = force_balance(M, Kinv, J[2])
+    # u = force_balance(M, Kinv, J[2])
     # calculate elongation vector e by back substituting u
-    e = elongation(u, len(J[0]))
+    # e = elongation(u, len(J[0]))
     # calculate internal force vector w by back substituting e
     # w = internal_force(J[0],u)
     print(K)
-    print(u)
-    print(e)
+    # print(u)
+    # print(e)
 
 
 if __name__ == "__main__":
