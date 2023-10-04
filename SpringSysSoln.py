@@ -53,6 +53,9 @@ def elongation(u, m):
 def force_balance(M, Kinv, B_conds):
     # calculate force vector
     f = np.array(M) * (9.81)  # [m/s^2]
+    if len(Kinv) < len(f) or len(Kinv) > len(f):
+        print("Improper Boundary Conditions Set")
+        exit()
     u = np.dot(f, Kinv)
 
     return u
@@ -120,19 +123,20 @@ def main():
             + " is too high and K is ill-conditioned"
         )
         exit()
+    # calculate u vector based on f vector and Kinv matrix
+    u = force_balance(M, Kinv, J[2])
+    # calculate elongation vector e by back substituting u
+    # e = elongation(u, len(J[0]))
+    # calculate internal force vector w by back substituting e
+    # w = internal_force(J[0],u)
+
     print("Condition Number of K: " + str(SVDvals[4]))
     print("")
     print("Singular Values of K: " + str(SVDvals[1]))
     print("")
     print("Eigen Values of K: " + str(np.power(2, SVDvals[1])))
     print("")
-    # new M updated for Bound conditions from Create_Kmat func
-    # calculate u vector based on f vector and Kinv matrix
-    # u = force_balance(M, Kinv, J[2])
-    # calculate elongation vector e by back substituting u
-    # e = elongation(u, len(J[0]))
-    # calculate internal force vector w by back substituting e
-    # w = internal_force(J[0],u)
+
     print(K)
     # print(u)
     # print(e)
