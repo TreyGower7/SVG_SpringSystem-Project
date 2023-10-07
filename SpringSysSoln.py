@@ -49,7 +49,7 @@ def elongation(u, m):
     e = np.array(np.zeros((int(m), 1)))
     # create elongation vector from u values
     for i in range(len(u) - 1):
-        e[i] = np.abs(u[i + 1] - u[i])
+        e[i] = u[i + 1] - u[i]
 
     return e
 
@@ -99,16 +99,14 @@ def create_Kmat(Kvec, Mvec, B_conds):
         K_new = K
     # Fixed/Free case
     if int(B_conds) == 2:
-        # first K row and column is deleted and force for that K set to 0
+        # first K row and column is deleted
         K_new = K[1:, 1:]
-        Mvec[0] = 0
     # Fixed/Fixed case
     if int(B_conds) == 1:
-        # first and last K row and column is deleted and force for those K's deleted
+        # first and last K row and column is deleted
         K_new = K[1:, 1:]
         K_new = K_new[:-1, :-1]
-        Mvec[0] = 0
-        Mvec[-1] = 0
+
     return [K_new, Mvec]
 
 
