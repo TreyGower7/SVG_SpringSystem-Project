@@ -35,19 +35,23 @@ def input_data():
     return data
 
 
+def internal_force(K, e):
+    # create C matrix
+    C = np.zeros(np.shape(K))
+    C = np.diag(K)
+    # solve w
+    w = np.dot(C, e)
+    return w
+
+
 def elongation(u, m):
     # initialize e as an mx1 column vector
     e = np.array(np.zeros((int(m), 1)))
     # create elongation vector from u values
-    for i in range(1, len(u)):
-        e[i - 1] = u[i] - u[i - 1]
+    for i in range(len(u) - 1):
+        e[i] = np.abs(u[i + 1] - u[i])
 
     return e
-
-
-# def internal_force(K, u):
-
-#  return C
 
 
 def force_balance(M, Kinv, B_conds):
@@ -58,13 +62,21 @@ def force_balance(M, Kinv, B_conds):
         exit()
     u = np.dot(f, Kinv)
 
+    if int(B_conds) == 2:
+        # first K row and column is deleted and force for that K set to 0
+        u = np.insert(u, 0, 0)
+    # Fixed/Fixed case
+    if int(B_conds) == 1:
+        # first and last K row and column is deleted and force for those K's deleted
+        # u = np.insert(u, 0, 0)
+        # u = np.append(u, 0, 0)
+        u = np.concatenate(([0], u, [0]))
     return u
 
 
 # creating the stiffness matrix
 def create_Kmat(Kvec, Mvec, B_conds):
-    # boundary condition for this should be Fixed/free
-    if len(Mvec) == len(Kvec):
+    if len(Mvec) == len(Kvec) or len(Mvec) < len(Kvec):
         Kvec = np.append(Kvec, Kvec[-1])
 
     m = int(len(Kvec))
@@ -81,26 +93,23 @@ def create_Kmat(Kvec, Mvec, B_conds):
     for i in range(m - 1):
         K[i, i + 1] = -Kvec[i]
         K[i + 1, i] = -Kvec[i]
-
     # Free/Free case
     if int(B_conds) == 3:
         # no action necessary for free/free
         K_new = K
-        M_new = Mvec
     # Fixed/Free case
     if int(B_conds) == 2:
-        # first K row and column is deleted and force for that K deleted
+        # first K row and column is deleted and force for that K set to 0
         K_new = K[1:, 1:]
-        M_new = Mvec[1:]
+        Mvec[0] = 0
     # Fixed/Fixed case
     if int(B_conds) == 1:
-        # first and last K row and column is deleted and force for that K deleted
+        # first and last K row and column is deleted and force for those K's deleted
         K_new = K[1:, 1:]
-        K_new = K[:-1, :-1]
-        M_new = Mvec[1:]
-        M_new = Mvec[:-1]
-
-    return [K_new, M_new]
+        K_new = K_new[:-1, :-1]
+        Mvec[0] = 0
+        Mvec[-1] = 0
+    return [K_new, Mvec]
 
 
 def main():
@@ -116,6 +125,7 @@ def main():
     SVDvals = SVDSoln.SVD(K)
     # Kinv from SVD
     Kinv = SVDvals[3]
+    # Check condition of K
     if SVDvals[4] >= 100:
         print(
             "Condition Number of K: "
@@ -126,20 +136,24 @@ def main():
     # calculate u vector based on f vector and Kinv matrix
     u = force_balance(M, Kinv, J[2])
     # calculate elongation vector e by back substituting u
-    # e = elongation(u, len(J[0]))
+    e = elongation(u, len(J[0]))
     # calculate internal force vector w by back substituting e
-    # w = internal_force(J[0],u)
+    w = internal_force(J[0], e)
 
     print("Condition Number of K: " + str(SVDvals[4]))
     print("")
     print("Singular Values of K: " + str(SVDvals[1]))
     print("")
     print("Eigen Values of K: " + str(np.power(2, SVDvals[1])))
-    print("")
 
+    print("K matrix:")
     print(K)
-    # print(u)
-    # print(e)
+    print("u vector:")
+    print(u)
+    print("e vector:")
+    print(e)
+    print("w vector:")
+    print(w)
 
 
 if __name__ == "__main__":
