@@ -1,5 +1,5 @@
 # SVG_Solver-Project
-A repository containing Python scripts to achieve singular value decomposition to then solve a spring-mass system.
+## A repository containing Python scripts to achieve singular value decomposition to then solve a spring-mass system.
 
 Below I have provided examples to show that my code is accurate. For further testing of your own KU=F system, visit this GitHub link and clone the repository to your machine: https://github.com/TreyGower7/SVG_SpringSystem-Project 
 
