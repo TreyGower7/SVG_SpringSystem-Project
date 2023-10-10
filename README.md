@@ -1,7 +1,7 @@
 # SVG_Solver-Project
-## A repository containing Python scripts to achieve singular value decomposition to then solve a spring-mass system.
+### A repository containing Python scripts to achieve singular value decomposition to then solve a spring-mass system.
 
-***`Below I have provided examples to show that my code is accurate. For further testing of your own KU=F system, visit this GitHub link and clone the repository to your machine: https://github.com/TreyGower7/SVG_SpringSystem-Project`***
+***Below I have provided examples to show that my code is accurate. For further testing of your own KU=F system, visit this GitHub link and clone the repository to your machine: https://github.com/TreyGower7/SVG_SpringSystem-Project***
 
 # My SVD code compared to Numpy Pythons Blackbox:
 For easy comparison, I have included a script SVDcompare.py for any user inputted matrix to be decomposed with my SVDDecomposition.py script and Nunpys blackbox call. For example:
