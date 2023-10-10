@@ -10,25 +10,6 @@ Factoring one matrix into three A = U*(Sigma)*(V^T)
 """
 
 
-def Enter_matrix():
-    """
-    Takes user input to create a matrix A
-
-    Args: None
-
-    Returns: user inputted matrix
-    """
-    n = input("Enter number of rows: \n")
-    m = input("Enter number of columns: \n")
-    A = np.zeros([int(n), int(m)], dtype=float)
-    # Populate matrix A
-    for i in range(int(n)):
-        for j in range(int(m)):
-            val = input("Enter A" + str(i + 1) + str(j + 1) + " value: ")
-            A[i, j] = float(val)
-    return A
-
-
 def Check_eig(eig_val):
     """Checks to see if eigen value are positive"""
     for i in range(len(eig_val)):
@@ -49,8 +30,6 @@ def SVD(A):
     """
     Returns a dictionary of all SVD matrices, condition number and the inverse given by A^-1= V*Sigma^{-1}*U^T
     """
-    if A is None:
-        A = Enter_matrix()
 
     # Compute A^T * A and A * A^T
     ATA = np.dot(A.T, A)
